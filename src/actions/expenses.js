@@ -39,3 +39,26 @@ export const editExpense = (id, updates) => ({
   id,
   updates
 })
+
+export const setExpenses = (expenses) => ({
+  type: 'SET_EXPENSES',
+  expenses
+})
+
+// return a promise so we can chain .then in the file where we call this
+export const startSetExpenses = () => {
+  return (dispatch) => {
+    return database.ref('expenses').once('value').then((snapshot) => {
+      const expenses = []
+
+      snapshot.forEach((childSnapshot) => {
+        expenses.push({
+          id: childSnapshot.key,
+          ...childSnapshot.val()
+        })
+      })
+
+      dispatch(setExpenses(expenses))
+    })
+  }
+}
